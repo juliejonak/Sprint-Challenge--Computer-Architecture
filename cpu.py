@@ -5,9 +5,11 @@ import sys
 HLT = 0b00000001
 LDI = 0b10000010
 PRN = 0b01000111
-MUL = 0b10100010
+MUL = 0b10100010 # ALU command
 POP = 0b01000110
 PUSH = 0b01000101
+CMP = 0b10100111 # ALU command
+
 
 class CPU:
     """Main CPU class."""
@@ -39,7 +41,8 @@ class CPU:
             0b01000111: self.prn,
             0b10100010: self.mul,
             0b01000110: self.pop,
-            0b01000101: self.push
+            0b01000101: self.push,
+            0b10100111: self.cmp_func
         }
 
     def __repr__(self):
@@ -92,6 +95,11 @@ class CPU:
         self.ram_write(value, self.SP)
         
         return (2, True)
+    
+    def cmp_func(self, operand_a, operand_b):
+        # Compares two values and sets a Flag
+        self.alu("CMP", operand_a, operand_b)
+        return (3, True)
 
     def load(self, program):
         """Load a program into memory."""
@@ -130,6 +138,14 @@ class CPU:
         elif op == "MUL":
             self.reg[reg_a] = (self.reg[reg_a]) * (self.reg[reg_b])
             return 2
+        
+        elif op == "CMP":
+            if self.reg[reg_a] > self.reg[reg_b]:
+                self.FL = 0b00000010
+            elif self.reg[reg_a] < self.reg[reg_b]:
+                self.FL = 0b00000100
+            elif self.reg[reg_a] == self.reg[reg_b]:
+                self.FL = 0b00000001
 
         else:
             raise Exception("Unsupported ALU operation")

@@ -10,8 +10,8 @@ POP = 0b01000110
 PUSH = 0b01000101
 CMP = 0b10100111 # ALU command
 JMP = 0b01010100
-
-
+JEQ = 0b01010101
+JNE = 0b01010110
 
 class CPU:
     """Main CPU class."""
@@ -45,7 +45,9 @@ class CPU:
             0b01000110: self.pop,
             0b01000101: self.push,
             0b10100111: self.cmp_func,
-            0b01010100: self.jmp
+            0b01010100: self.jmp,
+            0b01010101: self.jeq,
+            0b01010110: self.jne
         }
 
     def __repr__(self):
@@ -108,6 +110,22 @@ class CPU:
         # Sets PC to the address stored in given register
         self.PC = self.reg[operand_a]
         return (0, True)
+
+    def jeq(self, operand_a, operand_b):
+        # Sets PC to address stored in given register IF equal flag is True
+        if self.FL == 0b00000001:
+            self.PC = self.reg[operand_a]
+            # If PC jumps, do not increment
+            return(0, True)
+        return(2, True)
+
+    def jne(self, operand_a, operand_b):
+        # Sets PC to address stored in given register IF equal flag is False
+        if self.FL != 0b00000001:
+            self.PC = self.reg[operand_a]
+            # If PC jumps, do not increment
+            return(0, True)
+        return(2, True)
 
     def load(self, program):
         """Load a program into memory."""

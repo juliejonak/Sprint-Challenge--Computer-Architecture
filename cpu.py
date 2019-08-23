@@ -9,6 +9,8 @@ MUL = 0b10100010 # ALU command
 POP = 0b01000110
 PUSH = 0b01000101
 CMP = 0b10100111 # ALU command
+JMP = 0b01010100
+
 
 
 class CPU:
@@ -42,7 +44,8 @@ class CPU:
             0b10100010: self.mul,
             0b01000110: self.pop,
             0b01000101: self.push,
-            0b10100111: self.cmp_func
+            0b10100111: self.cmp_func,
+            0b01010100: self.jmp
         }
 
     def __repr__(self):
@@ -100,6 +103,11 @@ class CPU:
         # Compares two values and sets a Flag
         self.alu("CMP", operand_a, operand_b)
         return (3, True)
+    
+    def jmp(self, operand_a, operand_b):
+        # Sets PC to the address stored in given register
+        self.PC = self.reg[operand_a]
+        return (0, True)
 
     def load(self, program):
         """Load a program into memory."""
